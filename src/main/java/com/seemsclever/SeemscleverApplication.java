@@ -1,0 +1,18 @@
+package com.seemsclever;
+
+import com.seemsclever.entities.Task;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EntityScan("com.seemsclever.entities")
+@EnableScheduling
+public class SeemscleverApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SeemscleverApplication.class, args);
+	}
+
+}
