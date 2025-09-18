@@ -12,29 +12,25 @@ import java.util.List;
 
 @Component
 @Transactional
-public class TaskScheduler {
+public class TaskExpirationScheduler {
 
     private final TaskRepository taskRepository;
 
-    public TaskScheduler(TaskRepository taskRepository) {
+    public TaskExpirationScheduler(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
 
     @Scheduled(fixedRate = 5000)
     public void checkExpiredTasks(){
-        List<Task> tasks = taskRepository.findAll();
-
         Instant now = Instant.now();
 
-        tasks.forEach(task -> {
-            if (now.isAfter(task.getExpirationAt()) &&
-                    task.getStatus() != TaskStatus.COMPLETED &&
-                    task.getStatus() != TaskStatus.EXPIRED){
-                task.setStatus(TaskStatus.EXPIRED);
-            }
+        List<Task> expiredTasks = taskRepository.findExpiredTasks(now, List.of(TaskStatus.COMPLETED, TaskStatus.EXPIRED));
+
+        expiredTasks.forEach(task -> {
+            task.setStatus(TaskStatus.EXPIRED);
         });
 
-        taskRepository.saveAll(tasks);
+        taskRepository.saveAll(expiredTasks);
     }
 
 }
