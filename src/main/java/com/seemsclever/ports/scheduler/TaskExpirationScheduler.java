@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-@Transactional
 public class TaskExpirationScheduler {
 
     private final TaskRepository taskRepository;
@@ -20,6 +19,7 @@ public class TaskExpirationScheduler {
         this.taskRepository = taskRepository;
     }
 
+    @Transactional
     @Scheduled(fixedRate = 5000)
     public void checkExpiredTasks(){
         Instant now = Instant.now();
