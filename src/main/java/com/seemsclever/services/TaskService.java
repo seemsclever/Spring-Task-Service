@@ -53,6 +53,8 @@ public class TaskService {
                         HttpStatus.NOT_FOUND,
                         "Task not found with id " + id));
 
+        task.setUpdatedAt(Instant.now());
+
         if(taskRequest.getTitle() != null){
             task.setTitle(taskRequest.getTitle());
         }
@@ -68,16 +70,16 @@ public class TaskService {
         if(taskRequest.getExpirationAt() != null){
             task.setExpirationAt(taskRequest.getExpirationAt());
         }
-        if(taskRequest.getStatus() != null){
-            task.setStatus(taskRequest.getStatus());
-        }
         if(taskRequest.getUserId() != null){
             task.setUserId(taskRequest.getUserId());
         }
-
-        task.setUpdatedAt(Instant.now());
+        if(taskRequest.getStatus() != null){
+            task.setStatus(taskRequest.getStatus());
+            taskKafkaProducer.sendTaskToKafka(task);
+        }
 
         Task updatedTask = taskRepository.save(task);
+
         return MappingUtil.mapToTaskResponse(updatedTask);
     }
 
