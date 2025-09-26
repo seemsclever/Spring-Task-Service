@@ -3,6 +3,7 @@ package com.seemsclever.ports.scheduler;
 import com.seemsclever.entities.Task;
 import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.repositories.TaskRepository;
+import com.seemsclever.services.TaskService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,11 @@ import java.util.List;
 public class TaskExpirationScheduler {
 
     private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public TaskExpirationScheduler(TaskRepository taskRepository) {
+    public TaskExpirationScheduler(TaskRepository taskRepository, TaskService taskService) {
         this.taskRepository = taskRepository;
+        this.taskService = taskService;
     }
 
     @Transactional
@@ -27,10 +30,9 @@ public class TaskExpirationScheduler {
         List<Task> expiredTasks = taskRepository.findExpiredTasks(now, List.of(TaskStatus.COMPLETED, TaskStatus.EXPIRED));
 
         expiredTasks.forEach(task -> {
-            task.setStatus(TaskStatus.EXPIRED);
+            taskService.updateTaskStatusById(task.getId(), TaskStatus.EXPIRED);
         });
 
-        taskRepository.saveAll(expiredTasks);
     }
 
 }

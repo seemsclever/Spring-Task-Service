@@ -1,12 +1,16 @@
 package com.seemsclever.services;
 
+import com.seemsclever.TaskKafkaProducer;
+import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.ports.controllers.dto.TaskRequest;
 import com.seemsclever.ports.controllers.dto.TaskResponse;
 import com.seemsclever.entities.Task;
 import com.seemsclever.repositories.TaskRepository;
 import com.seemsclever.utils.MappingUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -16,9 +20,11 @@ import java.util.stream.Collectors;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskKafkaProducer taskKafkaProducer;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskKafkaProducer taskKafkaProducer) {
         this.taskRepository = taskRepository;
+        this.taskKafkaProducer = taskKafkaProducer;
     }
 
     public List<TaskResponse> getAllTasks(){
@@ -40,6 +46,7 @@ public class TaskService {
         return MappingUtil.mapToTaskResponse(savedTask);
     }
 
+    @Transactional
     public TaskResponse updateTask(Long id, TaskRequest taskRequest){
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -72,6 +79,15 @@ public class TaskService {
 
         Task updatedTask = taskRepository.save(task);
         return MappingUtil.mapToTaskResponse(updatedTask);
+    }
+
+    @Transactional
+    public void updateTaskStatusById(Long id, TaskStatus taskStatus){
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id " + id));
+        task.setStatus(taskStatus);
+        taskRepository.save(task);
+        taskKafkaProducer.sendTaskToKafka(task);
     }
 
     public void deleteTaskById(Long id){
