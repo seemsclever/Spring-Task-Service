@@ -2,15 +2,20 @@ package com.seemsclever.services;
 
 import com.seemsclever.TaskKafkaProducer;
 import com.seemsclever.entities.TaskStatus;
+import com.seemsclever.mappers.TaskMapper;
 import com.seemsclever.ports.controllers.dto.TaskRequest;
 import com.seemsclever.ports.controllers.dto.TaskResponse;
 import com.seemsclever.entities.Task;
 import com.seemsclever.repositories.TaskRepository;
 import com.seemsclever.utils.MappingUtil;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -18,19 +23,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskKafkaProducer taskKafkaProducer;
-
-    public TaskService(TaskRepository taskRepository, TaskKafkaProducer taskKafkaProducer) {
-        this.taskRepository = taskRepository;
-        this.taskKafkaProducer = taskKafkaProducer;
-    }
+    private final TaskMapper taskMapper;
 
     public List<TaskResponse> getAllTasks(){
-        return taskRepository.findAll().stream()
-                .map(MappingUtil::mapToTaskResponse)
-                .collect(Collectors.toList());
+        List<Task> tasks = taskRepository.findAll();
+        return taskMapper.toTaskResponseList(tasks);
     }
 
     public TaskResponse getTaskById(Long id){
@@ -38,12 +39,17 @@ public class TaskService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Task not found with id " + id));
-        return MappingUtil.mapToTaskResponse(task);
+        return taskMapper.toTaskResponse(task);
     }
 
+    @Transactional
     public TaskResponse createTask(TaskRequest taskRequest){
-        Task savedTask = taskRepository.save(MappingUtil.mapToTaskEntity(taskRequest));
-        return MappingUtil.mapToTaskResponse(savedTask);
+        Task task = taskMapper.toTaskEntity(taskRequest);
+        task.setCreatedAt(Instant.now());
+        task.setUpdatedAt(Instant.now());
+
+        Task savedTask = taskRepository.save(task);
+        return taskMapper.toTaskResponse(savedTask);
     }
 
     @Transactional
@@ -53,34 +59,24 @@ public class TaskService {
                         HttpStatus.NOT_FOUND,
                         "Task not found with id " + id));
 
+        updateTaskFields(task, taskRequest);
         task.setUpdatedAt(Instant.now());
-
-        if(taskRequest.getTitle() != null){
-            task.setTitle(taskRequest.getTitle());
-        }
-        if(taskRequest.getDescription() != null){
-            task.setDescription(taskRequest.getDescription());
-        }
-        if(taskRequest.getStartAt() != null){
-            task.setStartAt(taskRequest.getStartAt());
-        }
-        if(taskRequest.getEndAt() != null){
-            task.setEndAt(taskRequest.getEndAt());
-        }
-        if(taskRequest.getExpirationAt() != null){
-            task.setExpirationAt(taskRequest.getExpirationAt());
-        }
-        if(taskRequest.getUserId() != null){
-            task.setUserId(taskRequest.getUserId());
-        }
-        if(taskRequest.getStatus() != null){
-            task.setStatus(taskRequest.getStatus());
-            taskKafkaProducer.sendTaskToKafka(task);
-        }
 
         Task updatedTask = taskRepository.save(task);
 
-        return MappingUtil.mapToTaskResponse(updatedTask);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        taskKafkaProducer.sendTaskToKafka(task);
+                    }
+                }
+        );
+
+        return taskMapper.toTaskResponse(updatedTask);
+    }
+
+    private void updateTaskFields(Task task, TaskRequest taskRequest) {
     }
 
     @Transactional
@@ -89,7 +85,15 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Task not found with id " + id));
         task.setStatus(taskStatus);
         taskRepository.save(task);
-        taskKafkaProducer.sendTaskToKafka(task);
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        taskKafkaProducer.sendTaskToKafka(task);
+                    }
+                }
+        );
     }
 
     public void deleteTaskById(Long id){

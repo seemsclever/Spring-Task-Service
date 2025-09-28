@@ -1,21 +1,18 @@
 package com.seemsclever.ports.controllers.dto;
 
 import com.seemsclever.entities.TaskStatus;
-import lombok.Data;
 
 import java.time.Instant;
 
-@Data
-public class TaskRequest {
+public record TaskRequest(
+        String title,
+        String description,
 
-    private String title;
-    private String description;
+        Instant startAt,
+        Instant endAt,
+        Instant expirationAt,
 
-    private Instant startAt;
-    private Instant endAt;
-    private Instant expirationAt;
+        TaskStatus status,
 
-    private TaskStatus status;
-
-    private Long userId;
+        Long userId) {
 }

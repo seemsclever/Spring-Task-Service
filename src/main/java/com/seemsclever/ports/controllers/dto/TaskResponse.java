@@ -5,20 +5,19 @@ import lombok.Data;
 
 import java.time.Instant;
 
-@Data
-public class TaskResponse {
+public record TaskResponse(
+        Long id,
+        String title,
+        String description,
 
-    private Long id;
-    private String title;
-    private String description;
+        Instant createdAt,
+        Instant updatedAt,
+        Instant startAt,
+        Instant endAt,
+        Instant expirationAt,
 
-    private Instant createdAt;
-    private Instant updatedAt;
-    private Instant startAt;
-    private Instant endAt;
-    private Instant expirationAt;
+        TaskStatus status,
 
-    private TaskStatus status;
+        Long userId){
 
-    private Long userId;
 }
