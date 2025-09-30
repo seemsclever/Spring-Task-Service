@@ -1,4 +1,4 @@
-package com.seemsclever;
+package com.seemsclever.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.seemsclever.services;
 
-import com.seemsclever.TaskKafkaProducer;
+import com.seemsclever.utils.TaskKafkaProducer;
 import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.mappers.TaskMapper;
 import com.seemsclever.ports.controllers.dto.TaskRequest;
@@ -25,6 +25,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskKafkaProducer taskKafkaProducer;
     private final TaskMapper taskMapper;
+    private final TranslationService translationService;
 
     public List<TaskResponse> getAllTasks(){
         List<Task> tasks = taskRepository.findAll();
@@ -44,6 +45,8 @@ public class TaskService {
         Task task = taskMapper.toTaskEntity(taskRequest);
         task.setCreatedAt(Instant.now());
         task.setUpdatedAt(Instant.now());
+
+        task.setTitleOnTatar(translationService.translateToTatarLang(task.getTitle()));
 
         Task savedTask = taskRepository.save(task);
         return taskMapper.toTaskResponse(savedTask);

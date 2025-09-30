@@ -1,7 +1,5 @@
 package com.seemsclever.services;
 
-import com.seemsclever.RestClientConfig;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 

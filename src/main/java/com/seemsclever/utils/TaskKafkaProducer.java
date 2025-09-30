@@ -1,4 +1,4 @@
-package com.seemsclever;
+package com.seemsclever.utils;
 
 import com.seemsclever.entities.Task;
 import org.springframework.kafka.core.KafkaTemplate;

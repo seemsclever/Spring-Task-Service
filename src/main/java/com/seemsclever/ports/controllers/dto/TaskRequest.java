@@ -6,7 +6,7 @@ import java.time.Instant;
 
 public record TaskRequest(
         String title,
-        String title_on_tatar,
+        String titleOnTatar,
         String description,
 
         Instant startAt,

@@ -1,14 +1,13 @@
 package com.seemsclever.ports.controllers.dto;
 
 import com.seemsclever.entities.TaskStatus;
-import lombok.Data;
 
 import java.time.Instant;
 
 public record TaskResponse(
         Long id,
         String title,
-        String title_on_tatar,
+        String titleOnTatar,
         String description,
 
         Instant createdAt,
