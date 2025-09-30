@@ -8,6 +8,7 @@ import java.time.Instant;
 public record TaskResponse(
         Long id,
         String title,
+        String title_on_tatar,
         String description,
 
         Instant createdAt,

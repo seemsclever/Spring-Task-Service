@@ -22,4 +22,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             """)
     List<Task> findExpiredTasks(@Param("now") Instant now,
                                 @Param("excludedStatuses")List<TaskStatus> excludedStatuses);
+
+    @Query("SELECT t FROM Task t WHERE t.titleOnTatar IS NULL OR t.titleOnTatar = ''")
+    List<Task> findTasksWithEmptyTitleOnTatar();
 }

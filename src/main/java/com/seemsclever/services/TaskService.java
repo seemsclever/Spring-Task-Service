@@ -7,20 +7,17 @@ import com.seemsclever.ports.controllers.dto.TaskRequest;
 import com.seemsclever.ports.controllers.dto.TaskResponse;
 import com.seemsclever.entities.Task;
 import com.seemsclever.repositories.TaskRepository;
-import com.seemsclever.utils.MappingUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

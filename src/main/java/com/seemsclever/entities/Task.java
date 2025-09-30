@@ -24,6 +24,9 @@ public class Task {
     @Column(name="title", nullable = false)
     private String title;
 
+    @Column(name = "title_on_tatar")
+    private String titleOnTatar;
+
     @Column(name="description")
     private String description;
 
