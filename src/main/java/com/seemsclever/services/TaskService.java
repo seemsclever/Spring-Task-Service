@@ -43,6 +43,7 @@ public class TaskService {
     @Transactional
     public TaskResponse createTask(TaskRequest taskRequest){
         Task task = taskMapper.toTaskEntity(taskRequest);
+
         task.setCreatedAt(Instant.now());
         task.setUpdatedAt(Instant.now());
 

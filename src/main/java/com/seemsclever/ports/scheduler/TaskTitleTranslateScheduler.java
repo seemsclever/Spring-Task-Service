@@ -21,7 +21,7 @@ public class TaskTitleTranslateScheduler {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 30000)
     public void translateTitleToTatarLang(){
         List<Task> tasks = taskRepository.findTasksWithEmptyTitleOnTatar();
 

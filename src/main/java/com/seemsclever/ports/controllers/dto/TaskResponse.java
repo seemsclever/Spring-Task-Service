@@ -18,6 +18,6 @@ public record TaskResponse(
 
         TaskStatus status,
 
-        Long userId){
+        Long userId) {
 
 }

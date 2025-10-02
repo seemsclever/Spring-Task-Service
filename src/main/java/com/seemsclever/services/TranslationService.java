@@ -22,7 +22,6 @@ public class TranslationService {
                     .header("User-Agent", "Mozilla/5.0")
                     .retrieve()
                     .body(String.class);
-
         } catch (Exception e){
             System.err.println("Translation error: " + e.getMessage());
             throw new RuntimeException("Ошибка при обращении к сервису перевода", e);
