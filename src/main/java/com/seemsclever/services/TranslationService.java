@@ -1,5 +1,6 @@
 package com.seemsclever.services;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -12,6 +13,7 @@ public class TranslationService {
         this.restClient = restClient;
     }
 
+    @Timed("gettingTranslateToTatar")
     public String translateToTatarLang(String text){
         try {
             return restClient.get()

@@ -10,6 +10,7 @@ spring:
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 5
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,17 +19,38 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
-        spring.json.value.default.type: com.seemsclever.entities.Task
+        spring:
+          json:
+            add:
+              type:
+                headers: false
+
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+    access:
+      default: unrestricted
+  endpoint:
+    prometheus:
+      access: unrestricted
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 
 
 server:

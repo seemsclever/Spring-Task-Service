@@ -1,20 +1,27 @@
 package com.seemsclever.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seemsclever.entities.Task;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskKafkaProducer {
 
-    public final KafkaTemplate<String, Object> kafkaTemplate;
-
-    public TaskKafkaProducer(KafkaTemplate<String, Object> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     public void sendTaskToKafka(Task task){
-        kafkaTemplate.send("tasks", task);
+        String value = null;
+        try {
+            value = objectMapper.writeValueAsString(task);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        kafkaTemplate.send("tasks", value);
     }
 
 }
