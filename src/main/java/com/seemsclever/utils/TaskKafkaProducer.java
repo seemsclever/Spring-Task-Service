@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TaskKafkaProducer {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     public void sendTaskToKafka(Task task){
@@ -21,7 +21,7 @@ public class TaskKafkaProducer {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        kafkaTemplate.send("tasks", value);
+        kafkaTemplate.send("taskStatusUpdateEvent", value);
     }
 
 }

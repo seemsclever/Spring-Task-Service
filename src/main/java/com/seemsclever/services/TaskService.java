@@ -65,6 +65,7 @@ public class TaskService {
 
         Task updatedTask = taskRepository.save(task);
 
+        //todo id, json, тип события(обрабатывать по типу) (enum: taskStatusUpdateEvent)
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
