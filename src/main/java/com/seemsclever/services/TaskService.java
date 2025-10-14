@@ -1,5 +1,6 @@
 package com.seemsclever.services;
 
+import com.seemsclever.entities.OutboxEventType;
 import com.seemsclever.utils.TaskKafkaProducer;
 import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.mappers.TaskMapper;
@@ -26,6 +27,7 @@ public class TaskService {
     private final TaskKafkaProducer taskKafkaProducer;
     private final TaskMapper taskMapper;
     private final TranslationService translationService;
+    private final OutboxEventService outboxEventService;
 
     public List<TaskResponse> getAllTasks(){
         List<Task> tasks = taskRepository.findAll();
@@ -60,25 +62,19 @@ public class TaskService {
                         HttpStatus.NOT_FOUND,
                         "Task not found with id " + id));
 
+        TaskStatus oldStatus = task.getStatus();
+
         updateTaskFields(task, taskRequest);
+
         task.setUpdatedAt(Instant.now());
 
         Task updatedTask = taskRepository.save(task);
 
-        //todo id, json, тип события(обрабатывать по типу) (enum: taskStatusUpdateEvent)
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        taskKafkaProducer.sendTaskToKafka(task);
-                    }
-                }
-        );
+        if (oldStatus != updatedTask.getStatus()) {
+            outboxEventService.createOutboxEvent(updatedTask, OutboxEventType.TASK_STATUS_CHANGED);
+        }
 
         return taskMapper.toTaskResponse(updatedTask);
-    }
-
-    private void updateTaskFields(Task task, TaskRequest taskRequest) {
     }
 
     @Transactional
@@ -88,17 +84,37 @@ public class TaskService {
         task.setStatus(taskStatus);
         taskRepository.save(task);
 
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        taskKafkaProducer.sendTaskToKafka(task);
-                    }
-                }
-        );
+        outboxEventService.createOutboxEvent(task, OutboxEventType.TASK_STATUS_CHANGED);
     }
 
     public void deleteTaskById(Long id){
         taskRepository.deleteById(id);
+    }
+
+    private void updateTaskFields(Task task, TaskRequest taskRequest) {
+        if (taskRequest.title() != null) {
+            task.setTitle(taskRequest.title());
+        }
+        if (taskRequest.titleOnTatar() != null) {
+            task.setTitleOnTatar(taskRequest.titleOnTatar());
+        }
+        if (taskRequest.description() != null) {
+            task.setDescription(taskRequest.description());
+        }
+        if (taskRequest.startAt() != null) {
+            task.setStartAt(taskRequest.startAt());
+        }
+        if (taskRequest.endAt() != null) {
+            task.setEndAt(taskRequest.endAt());
+        }
+        if (taskRequest.expirationAt() != null) {
+            task.setExpirationAt(taskRequest.expirationAt());
+        }
+        if (taskRequest.status() != null) {
+            task.setStatus(taskRequest.status());
+        }
+        if (taskRequest.userId() != null) {
+            task.setUserId(taskRequest.userId());
+        }
     }
 }

@@ -17,4 +17,5 @@ public interface TaskMapper {
     List<TaskResponse> toTaskResponseList(List<Task> tasks);
 
     List<Task> toTaskEntityList(List<TaskRequest> taskRequests);
+
 }
