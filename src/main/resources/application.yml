@@ -55,3 +55,7 @@ management:
 
 server:
   port: 8181
+
+outbox:
+  limit: 100
+  timeoutInSeconds: 36000

@@ -1,6 +1,7 @@
 package com.seemsclever.services;
 
 import com.seemsclever.entities.OutboxEventType;
+import com.seemsclever.outbox.OutboxEventService;
 import com.seemsclever.utils.TaskKafkaProducer;
 import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.mappers.TaskMapper;
@@ -13,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -71,7 +70,7 @@ public class TaskService {
         Task updatedTask = taskRepository.save(task);
 
         if (oldStatus != updatedTask.getStatus()) {
-            outboxEventService.createOutboxEvent(updatedTask, OutboxEventType.TASK_STATUS_CHANGED);
+            outboxEventService.createOutboxEvent(updatedTask, OutboxEventType.TASK_STATUS_CHANGED.name());
         }
 
         return taskMapper.toTaskResponse(updatedTask);
@@ -84,7 +83,7 @@ public class TaskService {
         task.setStatus(taskStatus);
         taskRepository.save(task);
 
-        outboxEventService.createOutboxEvent(task, OutboxEventType.TASK_STATUS_CHANGED);
+        outboxEventService.createOutboxEvent(task, OutboxEventType.TASK_STATUS_CHANGED.name());
     }
 
     public void deleteTaskById(Long id){

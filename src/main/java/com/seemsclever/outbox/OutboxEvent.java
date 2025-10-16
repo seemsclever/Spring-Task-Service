@@ -1,4 +1,4 @@
-package com.seemsclever.entities;
+package com.seemsclever.outbox;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -27,17 +27,24 @@ public class OutboxEvent {
     @Column(name = "status")
     private OutboxEventStatus status;
 
-    @Column(name = "payload")
+    @Column(name = "payload", length = 1000)
     private String payload;
 
     @CreationTimestamp
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @Column(name = "refresh_time")
-    private Instant refreshTime;
+    @Column(name = "retry_time")
+    private Instant retryTime;
 
     @Column(name = "type")
     private String type;
 
+    public OutboxEvent(OutboxEventStatus status, String payload, Instant createdAt, Instant retryTime, String type) {
+        this.status = status;
+        this.payload = payload;
+        this.createdAt = createdAt;
+        this.retryTime = retryTime;
+        this.type = type;
+    }
 }
