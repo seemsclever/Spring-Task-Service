@@ -1,4 +1,4 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.handler;
 
 import org.springframework.stereotype.Component;
 

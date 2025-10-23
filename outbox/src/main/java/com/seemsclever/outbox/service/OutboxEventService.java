@@ -1,8 +1,12 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seemsclever.entities.OutboxEventType;
+import com.seemsclever.outbox.domain.OutboxEvent;
+import com.seemsclever.outbox.handler.OutboxEventFactory;
+import com.seemsclever.outbox.handler.OutboxEventHandler;
+import com.seemsclever.outbox.domain.OutboxEventStatus;
+import com.seemsclever.outbox.repository.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;

@@ -1,4 +1,4 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.domain;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;

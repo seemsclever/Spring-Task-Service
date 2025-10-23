@@ -1,4 +1,4 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.handler;
 
 public interface OutboxEventHandler {
     String getType();

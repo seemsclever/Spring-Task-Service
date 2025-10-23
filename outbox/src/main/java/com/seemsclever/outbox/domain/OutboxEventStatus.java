@@ -1,4 +1,4 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.domain;
 
 public enum OutboxEventStatus {
     IN_PROGRESS, DELIVERED

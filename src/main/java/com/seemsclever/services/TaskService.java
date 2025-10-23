@@ -1,7 +1,7 @@
 package com.seemsclever.services;
 
 import com.seemsclever.entities.OutboxEventType;
-import com.seemsclever.outbox.OutboxEventService;
+import com.seemsclever.outbox.service.OutboxEventService;
 import com.seemsclever.utils.TaskKafkaProducer;
 import com.seemsclever.entities.TaskStatus;
 import com.seemsclever.mappers.TaskMapper;

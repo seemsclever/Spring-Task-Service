@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seemsclever.entities.OutboxEventType;
 import com.seemsclever.entities.Task;
-import com.seemsclever.outbox.OutboxEventHandler;
+import com.seemsclever.outbox.handler.OutboxEventHandler;
 import com.seemsclever.utils.TaskKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

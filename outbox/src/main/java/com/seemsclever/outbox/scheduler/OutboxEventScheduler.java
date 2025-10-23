@@ -1,10 +1,10 @@
-package com.seemsclever.outbox;
+package com.seemsclever.outbox.scheduler;
 
-import com.seemsclever.utils.TaskKafkaProducer;
+import com.seemsclever.outbox.domain.OutboxEvent;
+import com.seemsclever.outbox.service.OutboxEventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
