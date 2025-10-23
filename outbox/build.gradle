@@ -1,0 +1,42 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.seemsclever'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Подключаем BOM из Spring Boot 3.5.5
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.5.5')
+
+    // Основные зависимости
+    api 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.kafka:spring-kafka'
+
+    // ✅ Добавляем Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Для автоконфигурации
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure'
+
+    // Lombok
+    implementation 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+    // Тестирование
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
